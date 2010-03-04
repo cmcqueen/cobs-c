@@ -57,6 +57,10 @@ def cobs_encode_2(in_bytes):
         idx = new_idx
     return str(out_bytes)
 
+# Choose which implementation to use
+cobs_encode = cobs_encode_2
+
+
 def cobs_decode(in_bytes):
     """Decode a string that was encoded using Consistent Overhead Byte Stuffing."""
     out_bytes = bytearray()
@@ -80,11 +84,14 @@ def cobs_decode(in_bytes):
                 break
     return str(out_bytes)
 
+
 test_strings = [
     "",
     "1",
     "12345",
     "12345\x006789",
+    "\x0012345\x006789",
+    "12345\x006789\x00",
     "\x00",
     "\x00\x00",
     str(bytearray(xrange(1, 254))),
@@ -93,10 +100,13 @@ test_strings = [
     str(bytearray(xrange(0, 256))),
 ]
 
-for test_string in test_strings:
-    encoded = cobs_encode_2(bytearray(test_string))
-    print(repr(encoded))
-    if 1:
-        decoded = cobs_decode(encoded)
-        if decoded != test_string:
-            raise Exception("Original doesn't match with decoded. Original %s, decoded %s" % (repr(test_string), repr(decoded)))
+
+if __name__ == "__main__":
+    # Basic unit testing
+    for test_string in test_strings:
+        encoded = cobs_encode(bytearray(test_string))
+        print(repr(encoded))
+        if 1:
+            decoded = cobs_decode(encoded)
+            if decoded != test_string:
+                raise Exception("Original doesn't match with decoded. Original %s, decoded %s" % (repr(test_string), repr(decoded)))
