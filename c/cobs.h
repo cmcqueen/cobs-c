@@ -1,16 +1,26 @@
-/*
+/*****************************************************************************
+ *
  * cobs.h
  *
  * Consistent Overhead Byte Stuffing
- */
+ *
+ ****************************************************************************/
 
 #ifndef COBS_H_
 #define COBS_H_
 
 
+/*****************************************************************************
+ * Includes
+ ****************************************************************************/
+
 #include <stdint.h>
 #include <stdlib.h>
 
+
+/*****************************************************************************
+ * Defines
+ ****************************************************************************/
 
 #ifndef FALSE
 #define FALSE       (0)
@@ -29,6 +39,10 @@
 #define COBS_DECODE_DST_BUF_LEN_MAX(SRC_LEN)            (((SRC_LEN) == 0) ? 0 : ((SRC_LEN) - 1))
 
 
+/*****************************************************************************
+ * Typedefs
+ ****************************************************************************/
+
 typedef enum
 {
     COBS_ENCODE_OK                  = 0x00,
@@ -42,7 +56,27 @@ typedef struct
 } cobs_encode_result;
 
 
+typedef enum
+{
+    COBS_DECODE_OK                  = 0x00,
+    COBS_DECODE_OUT_BUFFER_OVERFLOW = 0x01,
+    COBS_DECODE_ZERO_BYTE_IN_INPUT  = 0x02,
+    COBS_DECODE_INPUT_TOO_SHORT     = 0x04
+} cobs_decode_status;
+
+typedef struct
+{
+    size_t              out_len;
+    cobs_decode_status  status;
+} cobs_decode_result;
+
+
+/*****************************************************************************
+ * Function prototypes
+ ****************************************************************************/
+
 cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len);
+cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len);
 
 
 
