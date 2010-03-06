@@ -9,6 +9,23 @@
 #include "cobs.h"
 
 
+/*****************************************************************************
+ * Defines
+ ****************************************************************************/
+
+#ifndef FALSE
+#define FALSE       (0)
+#endif
+
+#ifndef TRUE
+#define TRUE        (!FALSE)
+#endif
+
+
+/*****************************************************************************
+ * Functions
+ ****************************************************************************/
+
 cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len)
 {
     cobs_encode_result  result              = { 0, COBS_ENCODE_OK };
