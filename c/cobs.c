@@ -153,6 +153,7 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
                     result.status |= COBS_DECODE_OUT_BUFFER_OVERFLOW;
                     break;
                 }
+                *dst_write_ptr++ = 0;
             }
         }
     }

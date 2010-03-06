@@ -48,7 +48,8 @@
 
 
 #define COBS_ENCODE_DST_BUF_LEN_MAX(SRC_LEN)            ((SRC_LEN) + ((SRC_LEN)/254u) + 1)
-#define COBS_DECODE_DST_BUF_LEN_MAX(SRC_LEN)            (((SRC_LEN) == 0) ? 0 : ((SRC_LEN) - 1))
+#define COBS_DECODE_DST_BUF_LEN_MAX(SRC_LEN)            (((SRC_LEN) <= 1) ? 1 : ((SRC_LEN) - 1))
+//#define COBS_DECODE_DST_BUF_LEN_MAX(SRC_LEN)            (SRC_LEN)
 
 
 /*****************************************************************************
@@ -139,13 +140,91 @@ cobsencode(PyObject* self, PyObject* args)
 }
 
 
+/*
+ * Decode
+ */
+static PyObject*
+cobsdecode(PyObject* self, PyObject* args)
+{
+    const unsigned char *   src_ptr;
+    Py_ssize_t              src_len;
+    Py_ssize_t              remaining_bytes;
+    PyObject *              dst_py_obj_ptr;
+    const unsigned char *   src_end_ptr;
+    unsigned char *         dst_buf_ptr;
+    unsigned char *         dst_write_ptr;
+    unsigned char           len_code;
+
+
+
+    if (!PyArg_ParseTuple(args, "s#", &src_ptr, &src_len))
+    {
+        return NULL;
+    }
+    src_end_ptr = src_ptr + src_len;
+
+    /* Make an output string */
+    dst_py_obj_ptr = PyString_FromStringAndSize(NULL, COBS_DECODE_DST_BUF_LEN_MAX(src_len));
+    if (dst_py_obj_ptr == NULL)
+    {
+        return NULL;
+    }
+    dst_buf_ptr = PyString_AsString(dst_py_obj_ptr);
+
+    /* Decode */
+    dst_write_ptr = dst_buf_ptr;
+
+    if (src_len != 0)
+    {
+        for (;;)
+        {
+            len_code = *src_ptr++;
+            if (len_code == 0)
+            {
+                //result.status |= COBS_DECODE_ZERO_BYTE_IN_INPUT;
+                break;
+            }
+            len_code--;
+
+            remaining_bytes = src_end_ptr - src_ptr;
+            if (len_code > remaining_bytes)
+            {
+                //result.status |= COBS_DECODE_INPUT_TOO_SHORT;
+                len_code = remaining_bytes;
+            }
+
+            memcpy(dst_write_ptr, src_ptr, len_code);
+            dst_write_ptr += len_code;
+            src_ptr += len_code;
+
+            if (src_ptr >= src_end_ptr)
+            {
+                break;
+            }
+
+            /* Add a zero to the end */
+            if (len_code != 0xFE)
+            {
+                *dst_write_ptr++ = 0;
+            }
+        }
+    }
+
+    /* Calculate the output length, from the value of dst_code_write_ptr */
+    _PyString_Resize(&dst_py_obj_ptr, dst_write_ptr - dst_buf_ptr);
+
+    return dst_py_obj_ptr;
+}
+
+
 /*****************************************************************************
  * Method table
  ****************************************************************************/
 static PyMethodDef methodTable[] =
 {
-    { "encode", cobsencode, METH_VARARGS },
-    { NULL, NULL }
+    { "encode", cobsencode, METH_VARARGS, "Encode a string using Consistent Overhead Byte Stuffing." },
+    { "decode", cobsdecode, METH_VARARGS, "Decode a string using Consistent Overhead Byte Stuffing." },
+    { NULL, NULL, 0, NULL }
 };
 
 

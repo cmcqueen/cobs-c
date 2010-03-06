@@ -3,9 +3,9 @@
 # Default
 #import cobs
 # C extension
-#import cobs._cobsext as cobs
+import cobs._cobsext as cobs
 # Pure Python
-import cobs._cobspy as cobs
+#import cobs._cobspy as cobs
 
 test_strings = [
     "",
