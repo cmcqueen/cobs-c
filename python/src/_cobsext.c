@@ -53,6 +53,13 @@
 
 
 /*****************************************************************************
+ * Variables
+ ****************************************************************************/
+
+static PyObject *CobsDecodeError;
+
+
+/*****************************************************************************
  * Functions
  ****************************************************************************/
 
@@ -181,16 +188,18 @@ cobsdecode(PyObject* self, PyObject* args)
             len_code = *src_ptr++;
             if (len_code == 0)
             {
-                //result.status |= COBS_DECODE_ZERO_BYTE_IN_INPUT;
-                break;
+                Py_DECREF(dst_py_obj_ptr);
+                PyErr_SetString(CobsDecodeError, "Zero byte found in input");
+                return NULL;
             }
             len_code--;
 
             remaining_bytes = src_end_ptr - src_ptr;
             if (len_code > remaining_bytes)
             {
-                //result.status |= COBS_DECODE_INPUT_TOO_SHORT;
-                len_code = remaining_bytes;
+                Py_DECREF(dst_py_obj_ptr);
+                PyErr_SetString(CobsDecodeError, "Not enough input bytes for length code");
+                return NULL;
             }
 
             memcpy(dst_write_ptr, src_ptr, len_code);
@@ -238,5 +247,11 @@ init_cobsext(void)
     PyObject *m;
 
     m = Py_InitModule("_cobsext", methodTable);
+    if (m == NULL)
+        return;
+
+    CobsDecodeError = PyErr_NewException("cobs.DecodeError", NULL, NULL);
+    Py_INCREF(CobsDecodeError);
+    PyModule_AddObject(m, "DecodeError", CobsDecodeError);
 }
 

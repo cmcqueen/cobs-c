@@ -2,6 +2,11 @@
 Consistent Overhead Byte Stuffing
 """
 
+
+class DecodeError(Exception):
+    pass
+
+
 def encode(in_bytes):
     """Encode a string using Consistent Overhead Byte Stuffing."""
     final_zero = True
@@ -41,13 +46,13 @@ def decode(in_bytes):
         while True:
             length = ord(in_bytes[idx])
             if length == 0:
-                raise Exception("Zero found in input")
+                raise DecodeError("Zero byte found in input")
             idx += 1
             end = idx + length - 1
             out_bytes += in_bytes[idx:end]
             idx = end
             if idx > len(in_bytes):
-                raise Exception("Not enough input bytes")
+                raise DecodeError("Not enough input bytes for length code")
             if idx < len(in_bytes):
                 if length < 0xFF:
                     out_bytes.append(0)
