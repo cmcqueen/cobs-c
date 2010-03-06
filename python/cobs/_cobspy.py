@@ -1,5 +1,5 @@
 """
-Consistent Overhead Byte Stuffing
+Consistent Overhead Byte Stuffing (COBS)
 """
 
 
@@ -8,7 +8,14 @@ class DecodeError(Exception):
 
 
 def encode(in_bytes):
-    """Encode a string using Consistent Overhead Byte Stuffing."""
+    """Encode a string using Consistent Overhead Byte Stuffing (COBS).
+    
+    Input is any byte string. Output is also a byte string.
+    
+    Encoding guarantees no zero bytes in the output. The output
+    string will be expanded slightly, by a predictable amount.
+    
+    An empty string is encoded to '\\x01'"""
     final_zero = True
     out_bytes = bytearray()
     collect_bytes = bytearray()
@@ -38,7 +45,13 @@ def encode(in_bytes):
 # Choose which implementation to use
 
 def decode(in_bytes):
-    """Decode a string that was encoded using Consistent Overhead Byte Stuffing."""
+    """Decode a string using Consistent Overhead Byte Stuffing (COBS).
+    
+    Input should be a byte string that has been COBS encoded. Output
+    is also a byte string.
+    
+    A cobs.DecodeError exception may be raised if the encoded data
+    is invalid."""
     out_bytes = bytearray()
     idx = 0
 
