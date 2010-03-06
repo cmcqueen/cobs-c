@@ -1,42 +1,31 @@
-----------------------------------------------------------------------------
-Copyright (c) 2010 Craig McQueen
+------------
+Introduction
+------------
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This is a Python module providing Consistent Overhead Byte Stuffing (COBS)
+encoding and decoding.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+Functions are provided for encoding and decoding according to the basic COBS
+method. The COBS variant "Zero Pair Elimination" (ZPE) is not implemented.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-----------------------------------------------------------------------------
+A pure Python implementation and a C extension implementation are provided.
+If the C extension is not available for some reason, the pure Python version
+will be used.
 
-The software in this package is a Python module for encoding and decoding
-strings using Consistent Overhead Byte Stuffing.  There is no attempt in this
-package to explain how COBS works.
+References:
+
+    http://www.stuartcheshire.org/papers/COBSforSIGCOMM/
+    http://www.stuartcheshire.org/papers/COBSforToN.pdf
+
 
 ------------
 Installation
 ------------
 
 The cobs package is installed using distutils.  If you have the tools
-installed to build a Python extension module, run the following command.
+installed to build a Python extension module, run the following command::
 
-python setup.py install
-
-If you don't have the tools to build an extension module, you will need to
-install the pure Python version using the following command.
-
-python setup_py.py install
+    python setup.py install
 
 NOTE: The version for Python 3.x is in the py3 directory.  The install process
 is the same but you need to use the 3.x interpreter.
@@ -45,8 +34,12 @@ is the same but you need to use the 3.x interpreter.
 Unit Testing
 ------------
 
+Basic unit testing is in the ``testing`` subdirectory. To run it::
 
-------
-Timing
-------
+    python test_cobs.py
 
+-------
+License
+-------
+
+See LICENSE.txt.
