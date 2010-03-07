@@ -66,7 +66,7 @@ static PyObject *CobsDecodeError;
 /*
  * Encode
  */
-static const unsigned char cobsencode__doc__[] =
+static const char cobsencode__doc__[] =
 "Encode a string using Consistent Overhead Byte Stuffing (COBS).\n"
 "\n"
 "Input is any byte string. Output is also a byte string.\n"
@@ -79,17 +79,16 @@ static const unsigned char cobsencode__doc__[] =
 static PyObject*
 cobsencode(PyObject* self, PyObject* args)
 {
-    const unsigned char *   src_ptr;
-    Py_ssize_t              src_len;
-    PyObject *              dst_py_obj_ptr;
-    const unsigned char *   src_end_ptr;
-    unsigned char *         dst_buf_ptr;
-    unsigned char *         dst_code_write_ptr;
-    unsigned char *         dst_write_ptr;
-    unsigned char           src_byte;
-    unsigned char           search_len;
-    unsigned char           final_zero;
-
+    const char *    src_ptr;
+    Py_ssize_t      src_len;
+    const char *    src_end_ptr;
+    char *          dst_buf_ptr;
+    char *          dst_code_write_ptr;
+    char *          dst_write_ptr;
+    char            src_byte;
+    unsigned char   search_len;
+    char            final_zero;
+    PyObject *      dst_py_obj_ptr;
 
 
     if (!PyArg_ParseTuple(args, "s#", &src_ptr, &src_len))
@@ -108,9 +107,9 @@ cobsencode(PyObject* self, PyObject* args)
 
     /* Encode */
     dst_code_write_ptr  = dst_buf_ptr;
-    dst_write_ptr       = dst_code_write_ptr + 1;
-    search_len          = 1;
-    final_zero          = TRUE;
+    dst_write_ptr = dst_code_write_ptr + 1;
+    search_len = 1;
+    final_zero = TRUE;
 
     /* Iterate over the source bytes */
     while (src_ptr < src_end_ptr)
@@ -119,7 +118,7 @@ cobsencode(PyObject* self, PyObject* args)
         if (src_byte == 0)
         {
             /* We found a zero byte */
-            *dst_code_write_ptr = search_len;
+            *dst_code_write_ptr = (char) search_len;
             dst_code_write_ptr = dst_write_ptr++;
             search_len = 1;
             final_zero = TRUE;
@@ -132,7 +131,7 @@ cobsencode(PyObject* self, PyObject* args)
             if (search_len == 0xFF)
             {
                 /* We have a long string of non-zero bytes */
-                *dst_code_write_ptr = search_len;
+                *dst_code_write_ptr = (char) search_len;
                 dst_code_write_ptr = dst_write_ptr++;
                 search_len = 1;
                 final_zero = FALSE;
@@ -146,7 +145,7 @@ cobsencode(PyObject* self, PyObject* args)
      */
     if ((search_len > 1) || (final_zero != FALSE))
     {
-        *dst_code_write_ptr = search_len;
+        *dst_code_write_ptr = (char) search_len;
         dst_code_write_ptr = dst_write_ptr;
     }
 
@@ -160,7 +159,7 @@ cobsencode(PyObject* self, PyObject* args)
 /*
  * Decode
  */
-static const unsigned char cobsdecode__doc__[] =
+static const char cobsdecode__doc__[] =
 "Decode a string using Consistent Overhead Byte Stuffing (COBS).\n"
 "\n"
 "Input should be a byte string that has been COBS encoded. Output\n"
@@ -172,15 +171,14 @@ static const unsigned char cobsdecode__doc__[] =
 static PyObject*
 cobsdecode(PyObject* self, PyObject* args)
 {
-    const unsigned char *   src_ptr;
+    const char *            src_ptr;
     Py_ssize_t              src_len;
+    const char *            src_end_ptr;
+    char *                  dst_buf_ptr;
+    char *                  dst_write_ptr;
     Py_ssize_t              remaining_bytes;
-    PyObject *              dst_py_obj_ptr;
-    const unsigned char *   src_end_ptr;
-    unsigned char *         dst_buf_ptr;
-    unsigned char *         dst_write_ptr;
     unsigned char           len_code;
-
+    PyObject *              dst_py_obj_ptr;
 
 
     if (!PyArg_ParseTuple(args, "s#", &src_ptr, &src_len))
@@ -204,7 +202,7 @@ cobsdecode(PyObject* self, PyObject* args)
     {
         for (;;)
         {
-            len_code = *src_ptr++;
+            len_code = (unsigned char) *src_ptr++;
             if (len_code == 0)
             {
                 Py_DECREF(dst_py_obj_ptr);
