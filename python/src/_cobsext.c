@@ -38,6 +38,14 @@
  * Defines
  ****************************************************************************/
 
+// Make compatible with previous Python versions
+#if PY_VERSION_HEX < 0x02050000
+typedef int Py_ssize_t;
+#define PY_SSIZE_T_MAX INT_MAX
+#define PY_SSIZE_T_MIN INT_MIN
+#endif
+
+
 #ifndef FALSE
 #define FALSE       (0)
 #endif
@@ -49,13 +57,15 @@
 
 #define COBS_ENCODE_DST_BUF_LEN_MAX(SRC_LEN)            ((SRC_LEN) + ((SRC_LEN)/254u) + 1)
 #define COBS_DECODE_DST_BUF_LEN_MAX(SRC_LEN)            (((SRC_LEN) <= 1) ? 1 : ((SRC_LEN) - 1))
-//#define COBS_DECODE_DST_BUF_LEN_MAX(SRC_LEN)            (SRC_LEN)
 
 
 /*****************************************************************************
  * Variables
  ****************************************************************************/
 
+/*
+ * cobs.DecodeError exception class.
+ */
 static PyObject *CobsDecodeError;
 
 
@@ -263,10 +273,12 @@ init_cobsext(void)
 {
     PyObject *m;
 
+    /* Initialise cobs module C extension cobs._cobsext */
     m = Py_InitModule3("_cobsext", methodTable, "Consistent Overhead Byte Stuffing (COBS)");
     if (m == NULL)
         return;
 
+    /* Initialise cobs.DecodeError exception class. */
     CobsDecodeError = PyErr_NewException("cobs.DecodeError", NULL, NULL);
     Py_INCREF(CobsDecodeError);
     PyModule_AddObject(m, "DecodeError", CobsDecodeError);

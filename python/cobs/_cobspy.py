@@ -1,5 +1,7 @@
 """
 Consistent Overhead Byte Stuffing (COBS)
+
+This version is for Python 2.6.
 """
 
 
@@ -21,7 +23,7 @@ def encode(in_bytes):
     collect_bytes = bytearray()
     idx = 0
     while True:
-        length = in_bytes.find('\x00', idx, idx + 0xFE)
+        length = in_bytes.find(b'\x00', idx, idx + 0xFE)
         if length < 0:
             remaining_length = len(in_bytes) - idx
             if remaining_length > 0xFE:
@@ -40,7 +42,7 @@ def encode(in_bytes):
         out_bytes.append(length + 1)
         out_bytes += in_bytes[idx:idx + length]
         idx = new_idx
-    return str(out_bytes)
+    return bytes(out_bytes)
 
 # Choose which implementation to use
 
@@ -71,4 +73,4 @@ def decode(in_bytes):
                     out_bytes.append(0)
             else:
                 break
-    return str(out_bytes)
+    return bytes(out_bytes)

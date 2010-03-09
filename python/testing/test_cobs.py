@@ -16,10 +16,10 @@ test_strings = [
     "12345\x006789\x00",
     "\x00",
     "\x00\x00",
-    str(bytearray(xrange(1, 254))),
-    str(bytearray(xrange(1, 255))),
-    str(bytearray(xrange(1, 256))),
-    str(bytearray(xrange(0, 256))),
+    bytes(bytearray(xrange(1, 254))),
+    bytes(bytearray(xrange(1, 255))),
+    bytes(bytearray(xrange(1, 256))),
+    bytes(bytearray(xrange(0, 256))),
 ]
 
 decode_error_test_strings = [
@@ -31,7 +31,7 @@ def test():
     # Basic unit testing
     for test_string in test_strings:
         encoded = cobs.encode(str(test_string))
-        print(repr(encoded))
+#        print(repr(encoded))
         if 1:
             decoded = cobs.decode(encoded)
             if decoded != test_string:
@@ -45,6 +45,8 @@ def test():
             pass
         else:
             raise Exception("Didn't raise a DecodeError exception for string %s" % repr(test_string))
+
+    print("All tests passed")
 
 if __name__ == "__main__":
     test()
