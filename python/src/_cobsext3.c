@@ -68,7 +68,7 @@ static PyObject *CobsDecodeError;
 /*
  * Encode
  */
-static const char cobsencode__doc__[] =
+PyDoc_STRVAR(cobsencode__doc__,
 "Encode a string using Consistent Overhead Byte Stuffing (COBS).\n"
 "\n"
 "Input is any byte string. Output is also a byte string.\n"
@@ -76,7 +76,7 @@ static const char cobsencode__doc__[] =
 "Encoding guarantees no zero bytes in the output. The output\n"
 "string will be expanded slightly, by a predictable amount.\n"
 "\n"
-"An empty string is encoded to '\\x01'.";
+"An empty string is encoded to '\\x01'.");
 
 static PyObject*
 cobsencode(PyObject* self, PyObject* args)
@@ -161,14 +161,14 @@ cobsencode(PyObject* self, PyObject* args)
 /*
  * Decode
  */
-static const char cobsdecode__doc__[] =
+PyDoc_STRVAR(cobsdecode__doc__,
 "Decode a string using Consistent Overhead Byte Stuffing (COBS).\n"
 "\n"
 "Input should be a byte string that has been COBS encoded. Output\n"
 "is also a byte string.\n"
 "\n"
 "A cobs.DecodeError exception may be raised if the encoded data\n"
-"is invalid.";
+"is invalid.");
 
 static PyObject*
 cobsdecode(PyObject* self, PyObject* args)
@@ -248,6 +248,11 @@ cobsdecode(PyObject* self, PyObject* args)
 /*****************************************************************************
  * Module definitions
  ****************************************************************************/
+
+PyDoc_STRVAR(module__doc__,
+"Consistent Overhead Byte Stuffing (COBS)"
+);
+
 static PyMethodDef methodTable[] =
 {
     { "encode", cobsencode, METH_VARARGS, cobsencode__doc__ },
@@ -259,10 +264,10 @@ static PyMethodDef methodTable[] =
 static struct PyModuleDef moduleDef =
 {
     PyModuleDef_HEAD_INIT,
-    "_cobsext",                                     // name of module
-    "Consistent Overhead Byte Stuffing (COBS)",     // module documentation
-    -1,             // size of per-interpreter state of the module,
-                    // or -1 if the module keeps state in global variables.
+    "_cobsext",         // name of module
+    module__doc__,      // module documentation
+    -1,                 // size of per-interpreter state of the module,
+                        // or -1 if the module keeps state in global variables.
     methodTable
 };
 

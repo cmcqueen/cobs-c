@@ -44,7 +44,6 @@ def encode(in_bytes):
         idx = new_idx
     return bytes(out_bytes)
 
-# Choose which implementation to use
 
 def decode(in_bytes):
     """Decode a string using Consistent Overhead Byte Stuffing (COBS).

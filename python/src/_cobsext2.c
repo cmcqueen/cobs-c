@@ -76,7 +76,7 @@ static PyObject *CobsDecodeError;
 /*
  * Encode
  */
-static const char cobsencode__doc__[] =
+PyDoc_STRVAR(cobsencode__doc__,
 "Encode a string using Consistent Overhead Byte Stuffing (COBS).\n"
 "\n"
 "Input is any byte string. Output is also a byte string.\n"
@@ -84,7 +84,7 @@ static const char cobsencode__doc__[] =
 "Encoding guarantees no zero bytes in the output. The output\n"
 "string will be expanded slightly, by a predictable amount.\n"
 "\n"
-"An empty string is encoded to '\\x01'.";
+"An empty string is encoded to '\\x01'.");
 
 static PyObject*
 cobsencode(PyObject* self, PyObject* args)
@@ -101,7 +101,7 @@ cobsencode(PyObject* self, PyObject* args)
     PyObject *      dst_py_obj_ptr;
 
 
-    if (!PyArg_ParseTuple(args, "s#", &src_ptr, &src_len))
+    if (!PyArg_ParseTuple(args, "s#:in_bytes", &src_ptr, &src_len))
     {
         return NULL;
     }
@@ -169,14 +169,14 @@ cobsencode(PyObject* self, PyObject* args)
 /*
  * Decode
  */
-static const char cobsdecode__doc__[] =
+PyDoc_STRVAR(cobsdecode__doc__,
 "Decode a string using Consistent Overhead Byte Stuffing (COBS).\n"
 "\n"
 "Input should be a byte string that has been COBS encoded. Output\n"
 "is also a byte string.\n"
 "\n"
 "A cobs.DecodeError exception may be raised if the encoded data\n"
-"is invalid.";
+"is invalid.");
 
 static PyObject*
 cobsdecode(PyObject* self, PyObject* args)
@@ -191,7 +191,7 @@ cobsdecode(PyObject* self, PyObject* args)
     PyObject *              dst_py_obj_ptr;
 
 
-    if (!PyArg_ParseTuple(args, "s#", &src_ptr, &src_len))
+    if (!PyArg_ParseTuple(args, "s#:in_bytes", &src_ptr, &src_len))
     {
         return NULL;
     }
@@ -254,8 +254,13 @@ cobsdecode(PyObject* self, PyObject* args)
 
 
 /*****************************************************************************
- * Method table
+ * Module definitions
  ****************************************************************************/
+
+PyDoc_STRVAR(module__doc__,
+"Consistent Overhead Byte Stuffing (COBS)"
+);
+
 static PyMethodDef methodTable[] =
 {
     { "encode", cobsencode, METH_VARARGS, cobsencode__doc__ },
@@ -274,7 +279,7 @@ init_cobsext(void)
     PyObject *m;
 
     /* Initialise cobs module C extension cobs._cobsext */
-    m = Py_InitModule3("_cobsext", methodTable, "Consistent Overhead Byte Stuffing (COBS)");
+    m = Py_InitModule3("_cobsext", methodTable, module__doc__);
     if (m == NULL)
         return;
 
