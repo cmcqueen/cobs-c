@@ -38,14 +38,6 @@
  * Defines
  ****************************************************************************/
 
-// Make compatible with previous Python versions
-#if PY_VERSION_HEX < 0x02050000
-typedef int Py_ssize_t;
-#define PY_SSIZE_T_MAX INT_MAX
-#define PY_SSIZE_T_MIN INT_MIN
-#endif
-
-
 #ifndef FALSE
 #define FALSE       (0)
 #endif
@@ -108,12 +100,12 @@ cobsencode(PyObject* self, PyObject* args)
     src_end_ptr = src_ptr + src_len;
 
     /* Make an output string */
-    dst_py_obj_ptr = PyString_FromStringAndSize(NULL, COBS_ENCODE_DST_BUF_LEN_MAX(src_len));
+    dst_py_obj_ptr = PyBytes_FromStringAndSize(NULL, COBS_ENCODE_DST_BUF_LEN_MAX(src_len));
     if (dst_py_obj_ptr == NULL)
     {
         return NULL;
     }
-    dst_buf_ptr = PyString_AsString(dst_py_obj_ptr);
+    dst_buf_ptr = PyBytes_AsString(dst_py_obj_ptr);
 
     /* Encode */
     dst_code_write_ptr  = dst_buf_ptr;
@@ -160,7 +152,7 @@ cobsencode(PyObject* self, PyObject* args)
     }
 
     /* Calculate the output length, from the value of dst_code_write_ptr */
-    _PyString_Resize(&dst_py_obj_ptr, dst_code_write_ptr - dst_buf_ptr);
+    _PyBytes_Resize(&dst_py_obj_ptr, dst_code_write_ptr - dst_buf_ptr);
 
     return dst_py_obj_ptr;
 }
@@ -198,12 +190,12 @@ cobsdecode(PyObject* self, PyObject* args)
     src_end_ptr = src_ptr + src_len;
 
     /* Make an output string */
-    dst_py_obj_ptr = PyString_FromStringAndSize(NULL, COBS_DECODE_DST_BUF_LEN_MAX(src_len));
+    dst_py_obj_ptr = PyBytes_FromStringAndSize(NULL, COBS_DECODE_DST_BUF_LEN_MAX(src_len));
     if (dst_py_obj_ptr == NULL)
     {
         return NULL;
     }
-    dst_buf_ptr = PyString_AsString(dst_py_obj_ptr);
+    dst_buf_ptr = PyBytes_AsString(dst_py_obj_ptr);
 
     /* Decode */
     dst_write_ptr = dst_buf_ptr;
@@ -247,14 +239,14 @@ cobsdecode(PyObject* self, PyObject* args)
     }
 
     /* Calculate the output length, from the value of dst_code_write_ptr */
-    _PyString_Resize(&dst_py_obj_ptr, dst_write_ptr - dst_buf_ptr);
+    _PyBytes_Resize(&dst_py_obj_ptr, dst_write_ptr - dst_buf_ptr);
 
     return dst_py_obj_ptr;
 }
 
 
 /*****************************************************************************
- * Method table
+ * Module definitions
  ****************************************************************************/
 static PyMethodDef methodTable[] =
 {
@@ -264,23 +256,36 @@ static PyMethodDef methodTable[] =
 };
 
 
+static struct PyModuleDef moduleDef =
+{
+    PyModuleDef_HEAD_INIT,
+    "_cobsext",                                     // name of module
+    "Consistent Overhead Byte Stuffing (COBS)",     // module documentation
+    -1,             // size of per-interpreter state of the module,
+                    // or -1 if the module keeps state in global variables.
+    methodTable
+};
+
+
 /*****************************************************************************
  * Module initialisation
  ****************************************************************************/
 
 PyMODINIT_FUNC
-init_cobsext(void)
+PyInit__cobsext(void)
 {
     PyObject *m;
 
     /* Initialise cobs module C extension cobs._cobsext */
-    m = Py_InitModule3("_cobsext", methodTable, "Consistent Overhead Byte Stuffing (COBS)");
+    m = PyModule_Create(&moduleDef);
     if (m == NULL)
-        return;
+        return NULL;
 
     /* Initialise cobs.DecodeError exception class. */
     CobsDecodeError = PyErr_NewException("cobs.DecodeError", NULL, NULL);
     Py_INCREF(CobsDecodeError);
     PyModule_AddObject(m, "DecodeError", CobsDecodeError);
+
+    return m;
 }
 

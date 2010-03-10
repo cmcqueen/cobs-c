@@ -8,29 +8,29 @@ import cobs
 #import cobs._cobspy as cobs
 
 test_strings = [
-    "",
-    "1",
-    "12345",
-    "12345\x006789",
-    "\x0012345\x006789",
-    "12345\x006789\x00",
-    "\x00",
-    "\x00\x00",
-    bytes(bytearray(xrange(1, 254))),
-    bytes(bytearray(xrange(1, 255))),
-    bytes(bytearray(xrange(1, 256))),
-    bytes(bytearray(xrange(0, 256))),
+    b"",
+    b"1",
+    b"12345",
+    b"12345\x006789",
+    b"\x0012345\x006789",
+    b"12345\x006789\x00",
+    b"\x00",
+    b"\x00\x00",
+    bytes(bytearray(range(1, 254))),
+    bytes(bytearray(range(1, 255))),
+    bytes(bytearray(range(1, 256))),
+    bytes(bytearray(range(0, 256))),
 ]
 
 decode_error_test_strings = [
-    "\x00",
-    "\x05123",
+    b"\x00",
+    b"\x05123",
 ]
 
 def test():
     # Basic unit testing
     for test_string in test_strings:
-        encoded = cobs.encode(str(test_string))
+        encoded = cobs.encode(test_string)
 #        print(repr(encoded))
         if 1:
             decoded = cobs.decode(encoded)
