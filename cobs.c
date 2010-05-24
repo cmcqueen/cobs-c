@@ -108,7 +108,10 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
     uint8_t *           dst_buf_end_ptr     = dst_buf_ptr + dst_buf_len;
     uint8_t *           dst_write_ptr       = dst_buf_ptr;
     size_t              remaining_bytes;
+    uint8_t             src_byte;
+    uint8_t             i;
     uint8_t             len_code;
+
 
     if (src_len != 0)
     {
@@ -136,9 +139,15 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
                 len_code = remaining_bytes;
             }
 
-            memcpy(dst_write_ptr, src_ptr, len_code);
-            dst_write_ptr += len_code;
-            src_ptr += len_code;
+            for (i = len_code; i != 0; i--)
+            {
+                src_byte = *src_ptr++;
+                if (src_byte == 0)
+                {
+                    result.status |= COBS_DECODE_ZERO_BYTE_IN_INPUT;
+                }
+                *dst_write_ptr++ = src_byte;
+            }
 
             if (src_ptr >= src_end_ptr)
             {
@@ -157,6 +166,8 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
             }
         }
     }
+
+    result.out_len = dst_write_ptr - dst_buf_ptr;
 
     return result;
 }
