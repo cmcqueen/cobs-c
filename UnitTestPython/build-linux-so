@@ -1,0 +1,3 @@
+gcc -c -fPIC -I.. ../cobs.c
+#ld -shared -soname cobs.so.1 -o cobs.so -lc cobs.o
+gcc -shared cobs.o -o cobs.so

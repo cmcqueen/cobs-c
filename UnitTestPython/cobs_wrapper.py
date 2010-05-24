@@ -15,7 +15,12 @@ import ctypes
 
 
 # Load COBS DLL
-cobs_dll = ctypes.cdll.cobs
+try:
+    # Windows
+    cobs_dll = ctypes.cdll.cobs
+except OSError:
+    # Linux
+    cobs_dll = ctypes.cdll.LoadLibrary('./cobs.so')
 
 
 # Set up ctypes function for COBS encode
