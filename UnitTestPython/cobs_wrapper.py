@@ -82,7 +82,7 @@ def encode(in_bytes):
     try:
         if ret_val.status & CobsEncodeStatus.OUT_BUFFER_OVERFLOW:
             raise EncodeError("output buffer overflow")
-        elif ret_val.status: 
+        elif ret_val.status != CobsEncodeStatus.OK:
             raise EncodeError("unknown error")
     except EncodeError as e:
 #        e.output = out_buffer[:ret_val.out_len]
@@ -104,7 +104,7 @@ def decode(in_bytes):
         raise DecodeError("zero byte found in input")
     elif ret_val.status & CobsDecodeStatus.INPUT_TOO_SHORT:
         raise DecodeError("not enough input bytes for length code")
-    elif ret_val.status: 
+    elif ret_val.status != CobsDecodeStatus.OK:
         raise DecodeError("unknown error")
 
     return out_buffer[:ret_val.out_len]

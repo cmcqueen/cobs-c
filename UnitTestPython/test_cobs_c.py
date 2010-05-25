@@ -59,12 +59,13 @@ class OutputOverflowTests(unittest.TestCase):
                     out_buffer = ctypes.create_string_buffer('\xAA' * real_out_buffer_len, real_out_buffer_len)
     
                     ret_val = cobs_wrapper.encode_cfunc(out_buffer, out_buffer_len, test_string, len(test_string))
+                    actual_encoded = out_buffer[:ret_val.out_len]
     
                     if out_buffer_len < len(expected_encoded_string):
                         # Check that the output buffer overflow error status is flagged
                         self.assertTrue((ret_val.status & cobs_wrapper.CobsEncodeStatus.OUT_BUFFER_OVERFLOW) != 0)
                         self.assertEqual(ret_val.out_len, out_buffer_len)
-                        actual_decoded = cobs.decode(out_buffer[:ret_val.out_len])
+                        actual_decoded = cobs.decode(actual_encoded)
                         self.assertTrue(test_string.startswith(actual_decoded),
                                         "for %s, encode buffer length %d, got %s" % (repr(test_string), out_buffer_len, repr(actual_decoded)))
     
@@ -73,11 +74,42 @@ class OutputOverflowTests(unittest.TestCase):
                         self.assertTrue((ret_val.status & cobs_wrapper.CobsEncodeStatus.OUT_BUFFER_OVERFLOW) == 0)
                         # Check that the correct encoded value is returned
 #                        self.assertEqual(ret_val.out_len, len(expected_encoded_string))
-                        self.assertEqual(out_buffer[:ret_val.out_len], expected_encoded_string)
+                        self.assertEqual(actual_encoded, expected_encoded_string)
     
                     self.assertEqual(out_buffer[ret_val.out_len:], '\xAA' * (real_out_buffer_len - ret_val.out_len))
             except AssertionError:
                 print >> sys.stderr, "For test string %s" % repr(test_string)
+                raise
+
+    def test_decode_output_overflow(self):
+        for (expected_decoded_string, encoded_string) in self.predefined_encodings:
+            try:
+                real_out_buffer_len = cobs_wrapper.decode_size_max(len(encoded_string)) + 100
+    
+                for out_buffer_len in xrange(0, real_out_buffer_len + 1):
+    
+                    out_buffer = ctypes.create_string_buffer('\xAA' * real_out_buffer_len, real_out_buffer_len)
+    
+                    ret_val = cobs_wrapper.decode_cfunc(out_buffer, out_buffer_len, encoded_string, len(encoded_string))
+                    actual_decoded = out_buffer[:ret_val.out_len]
+    
+                    if out_buffer_len < len(expected_decoded_string):
+                        # Check that the output buffer overflow error status is flagged
+                        self.assertTrue((ret_val.status & cobs_wrapper.CobsEncodeStatus.OUT_BUFFER_OVERFLOW) != 0)
+                        self.assertEqual(ret_val.out_len, out_buffer_len)
+                        self.assertTrue(expected_decoded_string.startswith(actual_decoded),
+                                        "for %s, decode buffer length %d, got %s" % (repr(expected_decoded_string), out_buffer_len, repr(actual_decoded)))
+    
+                    if out_buffer_len >= len(expected_decoded_string):
+                        # Check that the output buffer overflow error status is NOT flagged
+                        self.assertTrue((ret_val.status & cobs_wrapper.CobsEncodeStatus.OUT_BUFFER_OVERFLOW) == 0)
+                        # Check that the correct encoded value is returned
+#                        self.assertEqual(ret_val.out_len, len(expected_decoded_string))
+                        self.assertEqual(out_buffer[:ret_val.out_len], expected_decoded_string)
+    
+                    self.assertEqual(out_buffer[ret_val.out_len:], '\xAA' * (real_out_buffer_len - ret_val.out_len))
+            except AssertionError:
+                print >> sys.stderr, "For test string %s" % repr(expected_decoded_string)
                 raise
 
 

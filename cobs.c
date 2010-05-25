@@ -26,7 +26,6 @@
  * Functions
  ****************************************************************************/
 
-/* TODO: Update with latest algorithm from Python implementation */
 cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len)
 {
     cobs_encode_result  result              = { 0, COBS_ENCODE_OK };
@@ -38,7 +37,7 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
     uint8_t             search_len          = 1;
 
 
-    if (src_len > 0)
+    if (src_len != 0)
     {
         /* Iterate over the source bytes */
         for (;;)
@@ -89,17 +88,18 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
      */
     if (dst_code_write_ptr >= dst_buf_end_ptr)
     {
+        /* We've run out of output buffer to write the code byte. */
         result.status |= COBS_ENCODE_OUT_BUFFER_OVERFLOW;
-        dst_code_write_ptr = dst_buf_end_ptr;
+        dst_write_ptr = dst_buf_end_ptr;
     }
     else
     {
+        /* Write the last code (length) byte. */
         *dst_code_write_ptr = search_len;
-        dst_code_write_ptr = dst_write_ptr;
     }
 
     /* Calculate the output length, from the value of dst_code_write_ptr */
-    result.out_len = dst_code_write_ptr - dst_buf_ptr;
+    result.out_len = dst_write_ptr - dst_buf_ptr;
 
     return result;
 }
@@ -129,6 +129,7 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
             }
             len_code--;
 
+            /* Check length code against remaining input bytes */
             remaining_bytes = src_end_ptr - src_ptr;
             if (len_code > remaining_bytes)
             {
@@ -136,6 +137,7 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
                 len_code = remaining_bytes;
             }
 
+            /* Check length code against remaining output buffer space */
             remaining_bytes = dst_buf_end_ptr - dst_write_ptr;
             if (len_code > remaining_bytes)
             {
