@@ -26,6 +26,7 @@
  * Functions
  ****************************************************************************/
 
+/* TODO: Update with latest algorithm from Python implementation */
 cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len)
 {
     cobs_encode_result  result              = { 0, COBS_ENCODE_OK };
@@ -35,26 +36,17 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
     uint8_t *           dst_write_ptr       = dst_code_write_ptr + 1;
     uint8_t             src_byte            = 0;
     uint8_t             search_len          = 1;
-    uint8_t             final_zero          = TRUE;
 
 
-    /* Check for having zero output buffer space at the start--
-     * a special case that needs to be checked and handled specially.
-     */
-    if (dst_buf_len == 0)
-    {
-        result.out_len = 0;
-        result.status = COBS_ENCODE_OUT_BUFFER_OVERFLOW;
-    }
-    else
+    if (src_len > 0)
     {
         /* Iterate over the source bytes */
-        while (src_ptr < src_end_ptr)
+        for (;;)
         {
             /* Check for running out of output buffer space */
             if (dst_write_ptr >= dst_buf_end_ptr)
             {
-                result.status = COBS_ENCODE_OUT_BUFFER_OVERFLOW;
+                result.status |= COBS_ENCODE_OUT_BUFFER_OVERFLOW;
                 break;
             }
 
@@ -65,37 +57,49 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
                 *dst_code_write_ptr = search_len;
                 dst_code_write_ptr = dst_write_ptr++;
                 search_len = 1;
-                final_zero = TRUE;
+                if (src_ptr >= src_end_ptr)
+                {
+                    break;
+                }
             }
             else
             {
                 /* Copy the non-zero byte to the destination buffer */
                 *dst_write_ptr++ = src_byte;
                 search_len++;
+                if (src_ptr >= src_end_ptr)
+                {
+                    break;
+                }
                 if (search_len == 0xFF)
                 {
-                    /* We have a long string of non-zero bytes */
+                    /* We have a long string of non-zero bytes, so we need
+                     * to write out a length code of 0xFF. */
                     *dst_code_write_ptr = search_len;
                     dst_code_write_ptr = dst_write_ptr++;
                     search_len = 1;
-                    final_zero = FALSE;
                 }
             }
         }
-
-        /* We've reached the end of the source data (or possibly run out of output buffer)
-         * Finalise the remaining output. In particular, write the code (length) byte.
-         * Update the pointer to calculate the final output length.
-         */
-        if ((search_len > 1) || (final_zero != FALSE))
-        {
-            *dst_code_write_ptr = search_len;
-            dst_code_write_ptr = dst_write_ptr;
-        }
-
-        /* Calculate the output length, from the value of dst_code_write_ptr */
-        result.out_len = dst_code_write_ptr - dst_buf_ptr;
     }
+
+    /* We've reached the end of the source data (or possibly run out of output buffer)
+     * Finalise the remaining output. In particular, write the code (length) byte.
+     * Update the pointer to calculate the final output length.
+     */
+    if (dst_code_write_ptr >= dst_buf_end_ptr)
+    {
+        result.status |= COBS_ENCODE_OUT_BUFFER_OVERFLOW;
+        dst_code_write_ptr = dst_buf_end_ptr;
+    }
+    else
+    {
+        *dst_code_write_ptr = search_len;
+        dst_code_write_ptr = dst_write_ptr;
+    }
+
+    /* Calculate the output length, from the value of dst_code_write_ptr */
+    result.out_len = dst_code_write_ptr - dst_buf_ptr;
 
     return result;
 }

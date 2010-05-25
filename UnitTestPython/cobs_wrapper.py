@@ -17,10 +17,10 @@ import ctypes
 # Load COBS DLL
 try:
     # Windows
-    cobs_dll = ctypes.cdll.cobs
+    cobs_dll = ctypes.cdll.libcobs
 except OSError:
     # Linux
-    cobs_dll = ctypes.cdll.LoadLibrary('./cobs.so')
+    cobs_dll = ctypes.cdll.LoadLibrary('./libcobs.so')
 
 
 # Set up ctypes function for COBS encode
@@ -79,8 +79,14 @@ def encode(in_bytes):
 
     ret_val = encode_cfunc(out_buffer, len(out_buffer), in_bytes, len(in_bytes))
 
-    if ret_val.status & CobsEncodeStatus.OUT_BUFFER_OVERFLOW:
-        raise EncodeError("output buffer overflow")
+    try:
+        if ret_val.status & CobsEncodeStatus.OUT_BUFFER_OVERFLOW:
+            raise EncodeError("output buffer overflow")
+        elif ret_val.status: 
+            raise EncodeError("unknown error")
+    except EncodeError as e:
+#        e.output = out_buffer[:ret_val.out_len]
+        raise e
 
     return out_buffer[:ret_val.out_len]
 
@@ -98,6 +104,8 @@ def decode(in_bytes):
         raise DecodeError("zero byte found in input")
     elif ret_val.status & CobsDecodeStatus.INPUT_TOO_SHORT:
         raise DecodeError("not enough input bytes for length code")
+    elif ret_val.status: 
+        raise DecodeError("unknown error")
 
     return out_buffer[:ret_val.out_len]
 
