@@ -48,7 +48,6 @@ typedef enum
     COBSR_DECODE_OK                     = 0x00,
     COBSR_DECODE_OUT_BUFFER_OVERFLOW    = 0x01,
     COBSR_DECODE_ZERO_BYTE_IN_INPUT     = 0x02,
-    COBSR_DECODE_INPUT_TOO_SHORT        = 0x04
 } cobsr_decode_status;
 
 typedef struct

@@ -132,6 +132,7 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
     uint8_t *           dst_write_ptr       = dst_buf_ptr;
     size_t              remaining_input_bytes;
     size_t              remaining_output_bytes;
+    size_t              num_output_bytes;
     uint8_t             src_byte;
     uint8_t             i;
     uint8_t             len_code;
@@ -151,15 +152,16 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
             /* Calculate remaining input bytes */
             remaining_input_bytes = src_end_ptr - src_ptr;
 
+            num_output_bytes = MIN(len_code - 1, remaining_input_bytes);
             /* Check length code against remaining output buffer space */
             remaining_output_bytes = dst_buf_end_ptr - dst_write_ptr;
-            if (len_code > remaining_output_bytes)
+            if (num_output_bytes > remaining_output_bytes)
             {
                 result.status |= COBSR_DECODE_OUT_BUFFER_OVERFLOW;
-                len_code = remaining_output_bytes;
+                num_output_bytes = remaining_output_bytes;
             }
 
-            for (i = len_code; i != 0; i--)
+            for (i = num_output_bytes; i != 0; i--)
             {
                 src_byte = *src_ptr++;
                 if (src_byte == 0)
@@ -171,11 +173,24 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
 
             if (src_ptr >= src_end_ptr)
             {
+                /* Write final data byte, if applicable for COBS/R encoding. */
+                if (len_code - 1 > remaining_input_bytes)
+                {
+                    if (dst_write_ptr >= dst_buf_end_ptr)
+                    {
+                        result.status |= COBSR_DECODE_OUT_BUFFER_OVERFLOW;
+                    }
+                    else
+                    {
+                        *dst_write_ptr++ = len_code;
+                    }
+                }
+
                 break;
             }
 
             /* Add a zero to the end */
-            if (len_code != 0xFE)
+            if (len_code != 0xFF)
             {
                 if (dst_write_ptr >= dst_buf_end_ptr)
                 {
@@ -185,9 +200,9 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
                 *dst_write_ptr++ = 0;
             }
         }
-    }
 
-    result.out_len = dst_write_ptr - dst_buf_ptr;
+        result.out_len = dst_write_ptr - dst_buf_ptr;
+    }
 
     return result;
 }
