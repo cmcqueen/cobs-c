@@ -12,24 +12,7 @@ import ctypes
 import sys
 import unittest
 
-#from cobs import cobsr
-#from cobs.cobsr import _cobsr_py as cobsr
 import cobsr_wrapper
-
-
-def infinite_non_zero_generator():
-    while True:
-        for i in xrange(1,50):
-            for j in xrange(1,256, i):
-                yield j
-
-def non_zero_generator(length):
-    non_zeros = infinite_non_zero_generator()
-    for i in xrange(length):
-        yield non_zeros.next()
-
-def non_zero_bytes(length):
-    return ''.join(chr(i) for i in non_zero_generator(length))
 
 
 class OutputOverflowTests(unittest.TestCase):
