@@ -1,5 +1,7 @@
 
 ^\..*$
-^Debug/.*
-\.pyc
-\.dll
+^UnitTestC/Debug/.*
+\.pyc$
+\.o$
+\.dll$
+\.exe$
