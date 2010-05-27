@@ -61,6 +61,8 @@ static const data_info test_strings[] =
     { test_string_0, 0 },
     { test_string_0, 1 },
     { test_string_0, 2 },
+    { test_string_0, 3 },
+    { test_string_0, 4 },
     { test_string_1, sizeof(test_string_1) },
     { test_string_2, sizeof(test_string_2) },
     { test_string_3, sizeof(test_string_3) },
@@ -85,7 +87,7 @@ void print_hex(const uint8_t * src_ptr, size_t src_len)
     }
 }
 
-void test_decompress_1(void)
+void test_encode_1(void)
 {
     uint8_t             out_buffer[1000];
     cobs_encode_result  result;
@@ -107,7 +109,7 @@ void test_decompress_1(void)
 int main(int argc, char **argv)
 {
 #if 1
-    test_decompress_1();
+    test_encode_1();
 #endif
 
     return 0;
