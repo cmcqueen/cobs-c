@@ -33,7 +33,8 @@
 typedef enum
 {
     COBSR_ENCODE_OK                     = 0x00,
-    COBSR_ENCODE_OUT_BUFFER_OVERFLOW    = 0x01
+    COBSR_ENCODE_NULL_POINTER           = 0x01,
+    COBSR_ENCODE_OUT_BUFFER_OVERFLOW    = 0x02
 } cobsr_encode_status;
 
 typedef struct
@@ -46,8 +47,9 @@ typedef struct
 typedef enum
 {
     COBSR_DECODE_OK                     = 0x00,
-    COBSR_DECODE_OUT_BUFFER_OVERFLOW    = 0x01,
-    COBSR_DECODE_ZERO_BYTE_IN_INPUT     = 0x02,
+    COBSR_DECODE_NULL_POINTER           = 0x01,
+    COBSR_DECODE_OUT_BUFFER_OVERFLOW    = 0x02,
+    COBSR_DECODE_ZERO_BYTE_IN_INPUT     = 0x04,
 } cobsr_decode_status;
 
 typedef struct

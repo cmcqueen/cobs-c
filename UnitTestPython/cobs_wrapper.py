@@ -31,7 +31,8 @@ class _CobsEncodeResult(ctypes.Structure):
 
 class CobsEncodeStatus(object):
     OK                  = 0x00
-    OUT_BUFFER_OVERFLOW = 0x01
+    NULL_POINTER        = 0x01
+    OUT_BUFFER_OVERFLOW = 0x02
 
 
 encode_cfunc = cobs_dll.cobs_encode
@@ -46,9 +47,10 @@ class _CobsDecodeResult(ctypes.Structure):
 
 class CobsDecodeStatus(object):
     OK                  = 0x00
-    OUT_BUFFER_OVERFLOW = 0x01
-    ZERO_BYTE_IN_INPUT  = 0x02
-    INPUT_TOO_SHORT     = 0x04
+    NULL_POINTER        = 0x01
+    OUT_BUFFER_OVERFLOW = 0x02
+    ZERO_BYTE_IN_INPUT  = 0x04
+    INPUT_TOO_SHORT     = 0x08
 
 
 decode_cfunc = cobs_dll.cobs_decode

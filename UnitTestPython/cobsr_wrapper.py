@@ -31,7 +31,8 @@ class _CobsrEncodeResult(ctypes.Structure):
 
 class CobsrEncodeStatus(object):
     OK                  = 0x00
-    OUT_BUFFER_OVERFLOW = 0x01
+    NULL_POINTER        = 0x01
+    OUT_BUFFER_OVERFLOW = 0x02
 
 
 encode_cfunc = cobsr_dll.cobsr_encode
@@ -46,8 +47,9 @@ class _CobsrDecodeResult(ctypes.Structure):
 
 class CobsrDecodeStatus(object):
     OK                  = 0x00
-    OUT_BUFFER_OVERFLOW = 0x01
-    ZERO_BYTE_IN_INPUT  = 0x02
+    NULL_POINTER        = 0x01
+    OUT_BUFFER_OVERFLOW = 0x02
+    ZERO_BYTE_IN_INPUT  = 0x04
 
 
 decode_cfunc = cobsr_dll.cobsr_decode
