@@ -36,6 +36,13 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
     uint8_t             search_len          = 1;
 
 
+    /* First, do a NULL pointer check and return immediately if it fails. */
+    if ((dst_buf_ptr == NULL) || (src_ptr == NULL))
+    {
+        result.status = COBS_ENCODE_NULL_POINTER;
+        return result;
+    }
+
     if (src_len != 0)
     {
         /* Iterate over the source bytes */
@@ -115,6 +122,13 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
     uint8_t             i;
     uint8_t             len_code;
 
+
+    /* First, do a NULL pointer check and return immediately if it fails. */
+    if ((dst_buf_ptr == NULL) || (src_ptr == NULL))
+    {
+        result.status = COBS_DECODE_NULL_POINTER;
+        return result;
+    }
 
     if (src_len != 0)
     {
