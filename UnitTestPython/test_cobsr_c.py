@@ -15,7 +15,7 @@ import unittest
 import cobsr_wrapper
 
 
-class OutputOverflowTests(unittest.TestCase):
+class CSpecificTests(unittest.TestCase):
     predefined_encodings = [
         [ "",                                       "\x01"                                                          ],
         [ "\x01",                                   "\x02\x01"                                                      ],
@@ -41,6 +41,36 @@ class OutputOverflowTests(unittest.TestCase):
         [ array('B', range(0, 256)).tostring(),     "\x01\xff" + array('B', range(1, 255)).tostring() + "\xff"      ],
         [ array('B', range(2, 256)).tostring(),     "\xff" + array('B', range(2, 255)).tostring()                   ],
     ]
+
+    def test_encode_null_pointer(self):
+        for (test_string, expected_encoded_string) in self.predefined_encodings:
+            out_buffer_len = cobsr_wrapper.encode_size_max(len(test_string))
+            out_buffer = ctypes.create_string_buffer(out_buffer_len)
+
+            # First, check that output buffer NULL pointer generates error.
+            ret_val = cobsr_wrapper.encode_cfunc(None, out_buffer_len, test_string, len(test_string))
+            actual_encoded = out_buffer[:ret_val.out_len]
+            self.assertTrue(ret_val.status & cobsr_wrapper.CobsrEncodeStatus.NULL_POINTER)
+
+            # Second, check that input buffer NULL pointer generates error.
+            ret_val = cobsr_wrapper.encode_cfunc(out_buffer, out_buffer_len, None, len(test_string))
+            actual_encoded = out_buffer[:ret_val.out_len]
+            self.assertTrue(ret_val.status & cobsr_wrapper.CobsrEncodeStatus.NULL_POINTER)
+
+    def test_decode_null_pointer(self):
+        for (expected_decoded_string, encoded_string) in self.predefined_encodings:
+            out_buffer_len = cobsr_wrapper.decode_size_max(len(encoded_string))
+            out_buffer = ctypes.create_string_buffer(out_buffer_len)
+
+            # First, check that output buffer NULL pointer generates error.
+            ret_val = cobsr_wrapper.decode_cfunc(None, out_buffer_len, encoded_string, len(encoded_string))
+            actual_encoded = out_buffer[:ret_val.out_len]
+            self.assertTrue(ret_val.status & cobsr_wrapper.CobsrDecodeStatus.NULL_POINTER)
+
+            # Second, check that input buffer NULL pointer generates error.
+            ret_val = cobsr_wrapper.decode_cfunc(out_buffer, out_buffer_len, None, len(encoded_string))
+            actual_encoded = out_buffer[:ret_val.out_len]
+            self.assertTrue(ret_val.status & cobsr_wrapper.CobsrDecodeStatus.NULL_POINTER)
 
     def test_encode_output_overflow(self):
         for (test_string, expected_encoded_string) in self.predefined_encodings:
