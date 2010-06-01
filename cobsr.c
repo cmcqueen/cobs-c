@@ -20,10 +20,6 @@
 #define TRUE        (!FALSE)
 #endif
 
-#ifndef MIN
-#define MIN(X,Y)    ((X) < (Y) ? (X) : (Y))
-#endif
-
 
 /*****************************************************************************
  * Functions
