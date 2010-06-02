@@ -1,0 +1,4 @@
+[patterns]
+**.c = native
+**.py = native
+**.txt = native
