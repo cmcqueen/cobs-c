@@ -2,3 +2,4 @@
 **.c = native
 **.py = native
 **.txt = native
+**.bat = CRLF
