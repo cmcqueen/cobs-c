@@ -165,6 +165,39 @@ class CSpecificTests(unittest.TestCase):
                 print >> sys.stderr, "For test string %s" % repr(expected_decoded_string)
                 raise
 
+    def test_decode_single_buffer(self):
+        for (expected_decoded_string, encoded_string) in self.predefined_encodings:
+            try:
+                real_single_buffer_len = cobs_wrapper.decode_size_max(len(encoded_string)) + 100
+
+                single_buffer_len = len(encoded_string)
+
+                single_buffer = ctypes.create_string_buffer('\xAA' * real_single_buffer_len, real_single_buffer_len)
+                single_buffer.raw = encoded_string
+
+                ret_val = cobs_wrapper.decode_cfunc(single_buffer, len(encoded_string), single_buffer, len(encoded_string))
+                actual_decoded = single_buffer[:ret_val.out_len]
+
+                # Check that the output length is never larger than the output buffer size
+                self.assertTrue(ret_val.out_len <= single_buffer_len)
+
+                # Check that the function never writes bytes past the end of the buffer
+                self.assertEqual(single_buffer[single_buffer_len:], '\xAA' * (real_single_buffer_len - single_buffer_len))
+
+                # Check that the function never writes byte past the original input length
+                # (not strictly a requirement, but a nice-to-have if possible)
+                self.assertEqual(single_buffer[len(encoded_string):], '\xAA' * (real_single_buffer_len - len(encoded_string)))
+
+                # Check that the output buffer overflow error status is NOT flagged
+                self.assertTrue((ret_val.status & cobs_wrapper.CobsDecodeStatus.OUT_BUFFER_OVERFLOW) == 0)
+
+                # Check that the correct encoded value is returned
+                self.assertEqual(single_buffer[:ret_val.out_len], expected_decoded_string)
+
+            except AssertionError:
+                print >> sys.stderr, "For test string %s" % repr(expected_decoded_string)
+                raise
+
 
 def runtests():
     unittest.main()
