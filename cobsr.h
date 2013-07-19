@@ -63,9 +63,17 @@ typedef struct
  * Function prototypes
  ****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 cobsr_encode_result cobsr_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len);
 cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len);
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 
 #endif /* COBSR_H_ */
