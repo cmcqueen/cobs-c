@@ -19,7 +19,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_SUBST([LIB_SO_VERSION], [2:0:0])
 
 # Enable "automake" to simplify creating makefiles:
-AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror -Wno-portability])
 AM_SILENT_RULES([yes])
 AC_CONFIG_FILES([Makefile
 		cobs.pc])
