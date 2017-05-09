@@ -1,8 +1,0 @@
-
-^\..*$
-^UnitTestC/Debug/.*
-\.pyc$
-\.o$
-\.dll$
-\.so$
-\.exe$

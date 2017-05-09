@@ -1,6 +1,0 @@
-[patterns]
-**.c = native
-**.h = native
-**.py = native
-**.txt = native
-**.bat = CRLF
