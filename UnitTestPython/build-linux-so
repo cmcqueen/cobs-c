@@ -1,6 +1,0 @@
-#gcc -c -fPIC -I.. ../cobs.c -o libcobs.o
-#ld -shared -soname libcobs.so.1 -o libcobs.so -lc libcobs.o
-#gcc -shared libcobs.o -o libcobs.so
-
-gcc -fPIC -shared -I.. ../cobs.c -o libcobs.so
-gcc -fPIC -shared -I.. ../cobsr.c -o libcobsr.so
