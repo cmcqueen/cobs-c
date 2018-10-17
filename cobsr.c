@@ -184,7 +184,7 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
             /* Calculate remaining input bytes */
             remaining_input_bytes = src_end_ptr - src_ptr;
 
-            if ((len_code - 1) < remaining_input_bytes)
+            if ((len_code - 1u) < remaining_input_bytes)
             {
                 num_output_bytes = len_code - 1;
 
@@ -243,7 +243,7 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
                 }
 
                 /* Write final data byte, if applicable for COBS/R encoding. */
-                if (len_code - 1 > remaining_input_bytes)
+                if (len_code - 1u > remaining_input_bytes)
                 {
                     if (dst_write_ptr >= dst_buf_end_ptr)
                     {

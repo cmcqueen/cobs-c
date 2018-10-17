@@ -102,12 +102,15 @@ void test_encode_1(void)
 
         printf("Encoded data:\n");
         print_hex(out_buffer, result.out_len);
-        printf("\nLength %d, Status %02X\n", result.out_len, result.status);
+        printf("\nLength %zu, Status %02X\n", result.out_len, result.status);
     }
 }
 
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
 #if 1
     test_encode_1();
 #endif
