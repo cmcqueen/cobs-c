@@ -36,10 +36,13 @@
  *                 operation and the length of the result (that was written to
  *                 dst_buf_ptr)
  */
-cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len)
+cobs_encode_result cobs_encode(void * dst_buf_ptr, size_t dst_buf_len,
+                               const void * src_ptr, size_t src_len)
 {
     cobs_encode_result  result              = { 0, COBS_ENCODE_OK };
+    const uint8_t *     src_read_ptr        = src_ptr;
     const uint8_t *     src_end_ptr         = src_ptr + src_len;
+    uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
     uint8_t *           dst_buf_end_ptr     = dst_buf_ptr + dst_buf_len;
     uint8_t *           dst_code_write_ptr  = dst_buf_ptr;
     uint8_t *           dst_write_ptr       = dst_code_write_ptr + 1;
@@ -66,14 +69,14 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
                 break;
             }
 
-            src_byte = *src_ptr++;
+            src_byte = *src_read_ptr++;
             if (src_byte == 0)
             {
                 /* We found a zero byte */
                 *dst_code_write_ptr = search_len;
                 dst_code_write_ptr = dst_write_ptr++;
                 search_len = 1;
-                if (src_ptr >= src_end_ptr)
+                if (src_read_ptr >= src_end_ptr)
                 {
                     break;
                 }
@@ -83,7 +86,7 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
                 /* Copy the non-zero byte to the destination buffer */
                 *dst_write_ptr++ = src_byte;
                 search_len++;
-                if (src_ptr >= src_end_ptr)
+                if (src_read_ptr >= src_end_ptr)
                 {
                     break;
                 }
@@ -116,7 +119,7 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
     }
 
     /* Calculate the output length, from the value of dst_code_write_ptr */
-    result.out_len = dst_write_ptr - dst_buf_ptr;
+    result.out_len = dst_write_ptr - dst_buf_start_ptr;
 
     return result;
 }
@@ -133,10 +136,13 @@ cobs_encode_result cobs_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
  *                 operation and the length of the result (that was written to
  *                 dst_buf_ptr)
  */
-cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len)
+cobs_decode_result cobs_decode(void * dst_buf_ptr, size_t dst_buf_len,
+                               const void * src_ptr, size_t src_len)
 {
     cobs_decode_result  result              = { 0, COBS_DECODE_OK };
+    const uint8_t *     src_read_ptr        = src_ptr;
     const uint8_t *     src_end_ptr         = src_ptr + src_len;
+    uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
     uint8_t *           dst_buf_end_ptr     = dst_buf_ptr + dst_buf_len;
     uint8_t *           dst_write_ptr       = dst_buf_ptr;
     size_t              remaining_bytes;
@@ -156,7 +162,7 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
     {
         for (;;)
         {
-            len_code = *src_ptr++;
+            len_code = *src_read_ptr++;
             if (len_code == 0)
             {
                 result.status |= COBS_DECODE_ZERO_BYTE_IN_INPUT;
@@ -165,7 +171,7 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
             len_code--;
 
             /* Check length code against remaining input bytes */
-            remaining_bytes = src_end_ptr - src_ptr;
+            remaining_bytes = src_end_ptr - src_read_ptr;
             if (len_code > remaining_bytes)
             {
                 result.status |= COBS_DECODE_INPUT_TOO_SHORT;
@@ -182,7 +188,7 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
 
             for (i = len_code; i != 0; i--)
             {
-                src_byte = *src_ptr++;
+                src_byte = *src_read_ptr++;
                 if (src_byte == 0)
                 {
                     result.status |= COBS_DECODE_ZERO_BYTE_IN_INPUT;
@@ -190,7 +196,7 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
                 *dst_write_ptr++ = src_byte;
             }
 
-            if (src_ptr >= src_end_ptr)
+            if (src_read_ptr >= src_end_ptr)
             {
                 break;
             }
@@ -208,7 +214,7 @@ cobs_decode_result cobs_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const u
         }
     }
 
-    result.out_len = dst_write_ptr - dst_buf_ptr;
+    result.out_len = dst_write_ptr - dst_buf_start_ptr;
 
     return result;
 }

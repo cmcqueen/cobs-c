@@ -36,10 +36,13 @@
  *                 operation and the length of the result (that was written to
  *                 dst_buf_ptr)
  */
-cobsr_encode_result cobsr_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len)
+cobsr_encode_result cobsr_encode(void * dst_buf_ptr, size_t dst_buf_len,
+                                 const void * src_ptr, size_t src_len)
 {
     cobsr_encode_result result              = { 0, COBSR_ENCODE_OK };
+    const uint8_t *     src_read_ptr        = src_ptr;
     const uint8_t *     src_end_ptr         = src_ptr + src_len;
+    uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
     uint8_t *           dst_buf_end_ptr     = dst_buf_ptr + dst_buf_len;
     uint8_t *           dst_code_write_ptr  = dst_buf_ptr;
     uint8_t *           dst_write_ptr       = dst_code_write_ptr + 1;
@@ -66,14 +69,14 @@ cobsr_encode_result cobsr_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
                 break;
             }
 
-            src_byte = *src_ptr++;
+            src_byte = *src_read_ptr++;
             if (src_byte == 0)
             {
                 /* We found a zero byte */
                 *dst_code_write_ptr = search_len;
                 dst_code_write_ptr = dst_write_ptr++;
                 search_len = 1;
-                if (src_ptr >= src_end_ptr)
+                if (src_read_ptr >= src_end_ptr)
                 {
                     break;
                 }
@@ -83,7 +86,7 @@ cobsr_encode_result cobsr_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
                 /* Copy the non-zero byte to the destination buffer */
                 *dst_write_ptr++ = src_byte;
                 search_len++;
-                if (src_ptr >= src_end_ptr)
+                if (src_read_ptr >= src_end_ptr)
                 {
                     break;
                 }
@@ -132,7 +135,7 @@ cobsr_encode_result cobsr_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
     }
 
     /* Calculate the output length, from the value of dst_code_write_ptr */
-    result.out_len = dst_write_ptr - dst_buf_ptr;
+    result.out_len = dst_write_ptr - dst_buf_start_ptr;
 
     return result;
 }
@@ -149,10 +152,13 @@ cobsr_encode_result cobsr_encode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
  *                 operation and the length of the result (that was written to
  *                 dst_buf_ptr)
  */
-cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const uint8_t * src_ptr, size_t src_len)
+cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
+                                 const void * src_ptr, size_t src_len)
 {
     cobsr_decode_result result              = { 0, COBSR_DECODE_OK };
+    const uint8_t *     src_read_ptr        = src_ptr;
     const uint8_t *     src_end_ptr         = src_ptr + src_len;
+    uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
     uint8_t *           dst_buf_end_ptr     = dst_buf_ptr + dst_buf_len;
     uint8_t *           dst_write_ptr       = dst_buf_ptr;
     size_t              remaining_input_bytes;
@@ -174,7 +180,7 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
     {
         for (;;)
         {
-            len_code = *src_ptr++;
+            len_code = *src_read_ptr++;
             if (len_code == 0)
             {
                 result.status |= COBSR_DECODE_ZERO_BYTE_IN_INPUT;
@@ -182,7 +188,7 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
             }
 
             /* Calculate remaining input bytes */
-            remaining_input_bytes = src_end_ptr - src_ptr;
+            remaining_input_bytes = src_end_ptr - src_read_ptr;
 
             if ((len_code - 1u) < remaining_input_bytes)
             {
@@ -198,7 +204,7 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
 
                 for (i = num_output_bytes; i != 0; i--)
                 {
-                    src_byte = *src_ptr++;
+                    src_byte = *src_read_ptr++;
                     if (src_byte == 0)
                     {
                         result.status |= COBSR_DECODE_ZERO_BYTE_IN_INPUT;
@@ -234,7 +240,7 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
 
                 for (i = num_output_bytes; i != 0; i--)
                 {
-                    src_byte = *src_ptr++;
+                    src_byte = *src_read_ptr++;
                     if (src_byte == 0)
                     {
                         result.status |= COBSR_DECODE_ZERO_BYTE_IN_INPUT;
@@ -260,7 +266,7 @@ cobsr_decode_result cobsr_decode(uint8_t *dst_buf_ptr, size_t dst_buf_len, const
             }
         }
 
-        result.out_len = dst_write_ptr - dst_buf_ptr;
+        result.out_len = dst_write_ptr - dst_buf_start_ptr;
     }
 
     return result;
