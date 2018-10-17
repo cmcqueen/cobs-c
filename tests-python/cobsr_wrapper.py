@@ -17,10 +17,10 @@ import ctypes
 # Load COBS/R DLL
 try:
     # Windows
-    cobsr_dll = ctypes.cdll.libcobsr
+    cobsr_dll = ctypes.cdll.libcobs
 except OSError:
     # Linux
-    cobsr_dll = ctypes.cdll.LoadLibrary('./libcobsr.so')
+    cobsr_dll = ctypes.cdll.LoadLibrary('./libcobs.so')
 
 
 # Set up ctypes function for COBS/R encode
