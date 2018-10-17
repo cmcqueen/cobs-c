@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.68)
-AC_INIT([cobs], [0.2.2]) #set project name and version
+AC_INIT([cobs], [0.5.0]) #set project name and version
 
 # Put autotools auxiliary files in subdirectories to reduce clutter:
 AC_CONFIG_AUX_DIR([build-aux])
