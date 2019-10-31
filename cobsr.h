@@ -25,6 +25,12 @@
 #define COBSR_ENCODE_DST_BUF_LEN_MAX(SRC_LEN)           ((SRC_LEN) + (((SRC_LEN) + 253u)/254u))
 #define COBSR_DECODE_DST_BUF_LEN_MAX(SRC_LEN)           (SRC_LEN)
 
+/*
+ * For in-place encoding, the source data must be offset in the buffer by
+ * the following amount (or more).
+ */
+#define COBSR_ENCODE_SRC_OFFSET(SRC_LEN)                (((SRC_LEN) + 253u)/254u)
+
 
 /*****************************************************************************
  * Typedefs
