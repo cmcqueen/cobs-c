@@ -22,7 +22,7 @@
  * Defines
  ****************************************************************************/
 
-#define COBSR_ENCODE_DST_BUF_LEN_MAX(SRC_LEN)           ((SRC_LEN) + (((SRC_LEN) + 253u)/254u))
+#define COBSR_ENCODE_DST_BUF_LEN_MAX(SRC_LEN)           (((SRC_LEN) == 0u) ? 1u : ((SRC_LEN) + (((SRC_LEN) + 253u) / 254u)))
 #define COBSR_DECODE_DST_BUF_LEN_MAX(SRC_LEN)           (SRC_LEN)
 
 /*
