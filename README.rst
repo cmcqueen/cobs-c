@@ -164,7 +164,7 @@ Encoded in plain COBS (length code bytes are bold):
 Encoded in COBS/R:
 
 ======  ======  ======  ======  ======  ======
-**03**  2F      A2      **26**  92      73    
+**03**  2F      A2      **26**  92      73
 ======  ======  ======  ======  ======  ======
 
 Because the last data byte (**26**) is greater than the usual length code
