@@ -39,15 +39,15 @@
 cobsr_encode_result cobsr_encode(void * dst_buf_ptr, size_t dst_buf_len,
                                  const void * src_ptr, size_t src_len)
 {
-    cobsr_encode_result result              = { 0, COBSR_ENCODE_OK };
+    cobsr_encode_result result              = { 0u, COBSR_ENCODE_OK };
     const uint8_t *     src_read_ptr        = src_ptr;
     const uint8_t *     src_end_ptr         = src_ptr + src_len;
     uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
     uint8_t *           dst_buf_end_ptr     = dst_buf_ptr + dst_buf_len;
     uint8_t *           dst_code_write_ptr  = dst_buf_ptr;
-    uint8_t *           dst_write_ptr       = dst_code_write_ptr + 1;
-    uint8_t             src_byte            = 0;
-    uint8_t             search_len          = 1;
+    uint8_t *           dst_write_ptr       = dst_code_write_ptr + 1u;
+    uint8_t             src_byte            = 0u;
+    uint8_t             search_len          = 1u;
 
 
     /* First, do a NULL pointer check and return immediately if it fails. */
@@ -57,7 +57,7 @@ cobsr_encode_result cobsr_encode(void * dst_buf_ptr, size_t dst_buf_len,
         return result;
     }
 
-    if (src_len != 0)
+    if (src_len != 0u)
     {
         /* Iterate over the source bytes */
         for (;;)
@@ -70,12 +70,12 @@ cobsr_encode_result cobsr_encode(void * dst_buf_ptr, size_t dst_buf_len,
             }
 
             src_byte = *src_read_ptr++;
-            if (src_byte == 0)
+            if (src_byte == 0u)
             {
                 /* We found a zero byte */
                 *dst_code_write_ptr = search_len;
                 dst_code_write_ptr = dst_write_ptr++;
-                search_len = 1;
+                search_len = 1u;
                 if (src_read_ptr >= src_end_ptr)
                 {
                     break;
@@ -96,7 +96,7 @@ cobsr_encode_result cobsr_encode(void * dst_buf_ptr, size_t dst_buf_len,
                      * to write out a length code of 0xFF. */
                     *dst_code_write_ptr = search_len;
                     dst_code_write_ptr = dst_write_ptr++;
-                    search_len = 1;
+                    search_len = 1u;
                 }
             }
         }
@@ -135,7 +135,7 @@ cobsr_encode_result cobsr_encode(void * dst_buf_ptr, size_t dst_buf_len,
     }
 
     /* Calculate the output length, from the value of dst_code_write_ptr */
-    result.out_len = dst_write_ptr - dst_buf_start_ptr;
+    result.out_len = (size_t)(dst_write_ptr - dst_buf_start_ptr);
 
     return result;
 }
@@ -155,7 +155,7 @@ cobsr_encode_result cobsr_encode(void * dst_buf_ptr, size_t dst_buf_len,
 cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
                                  const void * src_ptr, size_t src_len)
 {
-    cobsr_decode_result result              = { 0, COBSR_DECODE_OK };
+    cobsr_decode_result result              = { 0u, COBSR_DECODE_OK };
     const uint8_t *     src_read_ptr        = src_ptr;
     const uint8_t *     src_end_ptr         = src_ptr + src_len;
     uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
@@ -163,7 +163,7 @@ cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
     uint8_t *           dst_write_ptr       = dst_buf_ptr;
     size_t              remaining_input_bytes;
     size_t              remaining_output_bytes;
-    size_t              num_output_bytes;
+    uint8_t             num_output_bytes;
     uint8_t             src_byte;
     uint8_t             i;
     uint8_t             len_code;
@@ -176,36 +176,36 @@ cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
         return result;
     }
 
-    if (src_len != 0)
+    if (src_len != 0u)
     {
         for (;;)
         {
             len_code = *src_read_ptr++;
-            if (len_code == 0)
+            if (len_code == 0u)
             {
                 result.status |= COBSR_DECODE_ZERO_BYTE_IN_INPUT;
                 break;
             }
 
             /* Calculate remaining input bytes */
-            remaining_input_bytes = src_end_ptr - src_read_ptr;
+            remaining_input_bytes = (size_t)(src_end_ptr - src_read_ptr);
 
             if ((len_code - 1u) < remaining_input_bytes)
             {
-                num_output_bytes = len_code - 1;
+                num_output_bytes = (uint8_t)(len_code - 1u);
 
                 /* Check length code against remaining output buffer space */
-                remaining_output_bytes = dst_buf_end_ptr - dst_write_ptr;
+                remaining_output_bytes = (size_t)(dst_buf_end_ptr - dst_write_ptr);
                 if (num_output_bytes > remaining_output_bytes)
                 {
                     result.status |= COBSR_DECODE_OUT_BUFFER_OVERFLOW;
-                    num_output_bytes = remaining_output_bytes;
+                    num_output_bytes = (uint8_t)remaining_output_bytes;
                 }
 
-                for (i = num_output_bytes; i != 0; i--)
+                for (i = num_output_bytes; i != 0u; i--)
                 {
                     src_byte = *src_read_ptr++;
-                    if (src_byte == 0)
+                    if (src_byte == 0u)
                     {
                         result.status |= COBSR_DECODE_ZERO_BYTE_IN_INPUT;
                     }
@@ -213,14 +213,14 @@ cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
                 }
 
                 /* Add a zero to the end */
-                if (len_code != 0xFF)
+                if (len_code != 0xFFu)
                 {
                     if (dst_write_ptr >= dst_buf_end_ptr)
                     {
                         result.status |= COBSR_DECODE_OUT_BUFFER_OVERFLOW;
                         break;
                     }
-                    *dst_write_ptr++ = 0;
+                    *dst_write_ptr++ = '\0';
                 }
             }
             else
@@ -228,20 +228,20 @@ cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
                 /* We've reached the last length code, so write the remaining
                  * bytes and then exit the loop. */
 
-                num_output_bytes = remaining_input_bytes;
+                num_output_bytes = (uint8_t)remaining_input_bytes;
 
                 /* Check length code against remaining output buffer space */
-                remaining_output_bytes = dst_buf_end_ptr - dst_write_ptr;
+                remaining_output_bytes = (size_t)(dst_buf_end_ptr - dst_write_ptr);
                 if (num_output_bytes > remaining_output_bytes)
                 {
                     result.status |= COBSR_DECODE_OUT_BUFFER_OVERFLOW;
-                    num_output_bytes = remaining_output_bytes;
+                    num_output_bytes = (uint8_t)remaining_output_bytes;
                 }
 
-                for (i = num_output_bytes; i != 0; i--)
+                for (i = num_output_bytes; i != 0u; i--)
                 {
                     src_byte = *src_read_ptr++;
-                    if (src_byte == 0)
+                    if (src_byte == 0u)
                     {
                         result.status |= COBSR_DECODE_ZERO_BYTE_IN_INPUT;
                     }
@@ -249,7 +249,7 @@ cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
                 }
 
                 /* Write final data byte, if applicable for COBS/R encoding. */
-                if (len_code - 1u > remaining_input_bytes)
+                if (len_code > remaining_input_bytes)
                 {
                     if (dst_write_ptr >= dst_buf_end_ptr)
                     {
@@ -257,7 +257,7 @@ cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
                     }
                     else
                     {
-                        *dst_write_ptr++ = len_code;
+                        *dst_write_ptr++ = len_code + 1u;
                     }
                 }
 
@@ -266,7 +266,7 @@ cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
             }
         }
 
-        result.out_len = dst_write_ptr - dst_buf_start_ptr;
+        result.out_len = (size_t)(dst_write_ptr - dst_buf_start_ptr);
     }
 
     return result;
