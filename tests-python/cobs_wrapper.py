@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 """Consistent Overhead Byte Stuffing (COBS)
 
 Python high-level wrapper for C functions, using ctypes.
@@ -20,7 +22,7 @@ try:
     cobs_dll = ctypes.cdll.libcobs
 except OSError:
     # Linux
-    cobs_dll = ctypes.cdll.LoadLibrary('./libcobs.so')
+    cobs_dll = ctypes.cdll.LoadLibrary('libcobs.so')
 
 
 # Set up ctypes function for COBS encode
@@ -83,12 +85,29 @@ class DecodeError(Exception):
     pass
 
 
+def _get_buffer_view(in_bytes):
+    mv = memoryview(in_bytes)
+    if mv.ndim > 1 or mv.itemsize > 1:
+        raise BufferError('object must be a single-dimension buffer of bytes.')
+    try:
+        mv = mv.cast('c')
+    except AttributeError:
+        pass
+    return mv
+
+
 # Python wrapper function for COBS encode
 def encode(in_bytes):
-    out_buffer_len = encode_size_max(len(in_bytes))
+    if isinstance(in_bytes, str):
+        raise TypeError('Unicode-objects must be encoded as bytes first')
+    in_bytes_bytes = bytes(_get_buffer_view(in_bytes))
+    out_buffer_len = encode_size_max(len(in_bytes_bytes))
     out_buffer = ctypes.create_string_buffer(out_buffer_len)
 
-    ret_val = encode_cfunc(out_buffer, len(out_buffer), in_bytes, len(in_bytes))
+    try:
+        ret_val = encode_cfunc(out_buffer, len(out_buffer), in_bytes_bytes, len(in_bytes_bytes))
+    except ctypes.ArgumentError as e:
+        raise TypeError()
 
     try:
         if ret_val.status & CobsEncodeStatus.OUT_BUFFER_OVERFLOW:
@@ -104,10 +123,13 @@ def encode(in_bytes):
 
 # Python wrapper function for COBS decode
 def decode(in_bytes):
-    out_buffer_len = decode_size_max(len(in_bytes))
+    if isinstance(in_bytes, str):
+        raise TypeError('Unicode-objects must be encoded as bytes first')
+    in_bytes_bytes = bytes(_get_buffer_view(in_bytes))
+    out_buffer_len = decode_size_max(len(in_bytes_bytes))
     out_buffer = ctypes.create_string_buffer(out_buffer_len)
 
-    ret_val = decode_cfunc(out_buffer, len(out_buffer), in_bytes, len(in_bytes))
+    ret_val = decode_cfunc(out_buffer, len(out_buffer), in_bytes_bytes, len(in_bytes_bytes))
     
     if ret_val.status & CobsDecodeStatus.OUT_BUFFER_OVERFLOW:
         raise DecodeError("output buffer overflow")
