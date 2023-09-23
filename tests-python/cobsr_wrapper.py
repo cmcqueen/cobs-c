@@ -19,7 +19,7 @@ import ctypes
 # Load COBS/R DLL
 try:
     # Windows
-    cobsr_dll = ctypes.cdll.libcobs
+    cobsr_dll = ctypes.WinDLL('./libcobs.dll')
 except OSError:
     # Linux
     cobsr_dll = ctypes.cdll.LoadLibrary('libcobs.so')
