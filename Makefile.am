@@ -20,9 +20,10 @@ pkgconfig_DATA = @PACKAGE_NAME@.pc
 #######################################
 # Tests
 
-TESTS = cobs-test
+TESTS = test-cobs
 
-check_PROGRAMS = cobs-test
+check_PROGRAMS = test-cobs
 
-cobs_test_SOURCES = tests-c/main.c
-cobs_test_LDADD = lib@PACKAGE_NAME@.la
+test_cobs_SOURCES = tests-c/test-cobs.c tests-c/unity/unity.c
+test_cobs_CFLAGS = -I${srcdir}/tests-c/unity
+test_cobs_LDADD = lib@PACKAGE_NAME@.la
