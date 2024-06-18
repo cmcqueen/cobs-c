@@ -129,6 +129,23 @@ static uint8_t non_zero_byte_fill(void * p_dst, uint8_t start_value, size_t len)
  * Test Functions
  ****************************************************************************/
 
+void test_COBS_ENCODE_DST_BUF_LEN_MAX(void)
+{
+    TEST_ASSERT_EQUAL_size_t(1, COBS_ENCODE_DST_BUF_LEN_MAX(0));
+    TEST_ASSERT_EQUAL_size_t(2, COBS_ENCODE_DST_BUF_LEN_MAX(1));
+    TEST_ASSERT_EQUAL_size_t(3, COBS_ENCODE_DST_BUF_LEN_MAX(2));
+
+    TEST_ASSERT_EQUAL_size_t(254, COBS_ENCODE_DST_BUF_LEN_MAX(253));
+    TEST_ASSERT_EQUAL_size_t(255, COBS_ENCODE_DST_BUF_LEN_MAX(254));
+    TEST_ASSERT_EQUAL_size_t(257, COBS_ENCODE_DST_BUF_LEN_MAX(255));
+    TEST_ASSERT_EQUAL_size_t(258, COBS_ENCODE_DST_BUF_LEN_MAX(256));
+
+    TEST_ASSERT_EQUAL_size_t(509, COBS_ENCODE_DST_BUF_LEN_MAX(507));
+    TEST_ASSERT_EQUAL_size_t(510, COBS_ENCODE_DST_BUF_LEN_MAX(508));
+    TEST_ASSERT_EQUAL_size_t(512, COBS_ENCODE_DST_BUF_LEN_MAX(509));
+    TEST_ASSERT_EQUAL_size_t(513, COBS_ENCODE_DST_BUF_LEN_MAX(510));
+}
+
 void test_cobs_fixed(void)
 {
     uint8_t             encode_out[COBS_ENCODE_DST_BUF_LEN_MAX(1000)];
@@ -289,6 +306,7 @@ int main(int argc, char **argv)
 
     UNITY_BEGIN();
 
+    RUN_TEST(test_COBS_ENCODE_DST_BUF_LEN_MAX);
     RUN_TEST(test_cobs_fixed);
     RUN_TEST(test_cobs_zeros);
     RUN_TEST(test_cobs_255);
