@@ -41,10 +41,10 @@ cobsr_encode_result cobsr_encode(void * dst_buf_ptr, size_t dst_buf_len,
 {
     cobsr_encode_result result              = { 0u, COBSR_ENCODE_OK };
     const uint8_t *     src_read_ptr        = src_ptr;
-    const uint8_t *     src_end_ptr         = src_ptr + src_len;
+    const uint8_t *     src_end_ptr         = src_read_ptr + src_len;
     uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
-    uint8_t *           dst_buf_end_ptr     = dst_buf_ptr + dst_buf_len;
-    uint8_t *           dst_code_write_ptr  = dst_buf_ptr;
+    uint8_t *           dst_buf_end_ptr     = dst_buf_start_ptr + dst_buf_len;
+    uint8_t *           dst_code_write_ptr  = dst_buf_start_ptr;
     uint8_t *           dst_write_ptr       = dst_code_write_ptr + 1u;
     uint8_t             src_byte            = 0u;
     uint8_t             search_len          = 1u;
@@ -157,10 +157,10 @@ cobsr_decode_result cobsr_decode(void * dst_buf_ptr, size_t dst_buf_len,
 {
     cobsr_decode_result result              = { 0u, COBSR_DECODE_OK };
     const uint8_t *     src_read_ptr        = src_ptr;
-    const uint8_t *     src_end_ptr         = src_ptr + src_len;
+    const uint8_t *     src_end_ptr         = src_read_ptr + src_len;
     uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
-    uint8_t *           dst_buf_end_ptr     = dst_buf_ptr + dst_buf_len;
-    uint8_t *           dst_write_ptr       = dst_buf_ptr;
+    uint8_t *           dst_buf_end_ptr     = dst_buf_start_ptr + dst_buf_len;
+    uint8_t *           dst_write_ptr       = dst_buf_start_ptr;
     size_t              remaining_input_bytes;
     size_t              remaining_output_bytes;
     uint8_t             num_output_bytes;
