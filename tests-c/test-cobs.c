@@ -299,12 +299,38 @@ void tearDown( void )
 {
 }
 
+static void test_cobs_null_pointers(void)
+{
+    uint8_t buffer[4] = { 1u, 0u, 0u, 0u };
+    size_t len;
+    cobs_encode_result encoded;
+    cobs_decode_result decoded;
+
+    for (len = 0u; len <= 1u; len++)
+    {
+        encoded = cobs_encode(buffer, sizeof(buffer), NULL, len);
+        TEST_ASSERT_EQUAL(COBS_ENCODE_NULL_POINTER, encoded.status);
+        TEST_ASSERT_EQUAL_size_t(0u, encoded.out_len);
+        encoded = cobs_encode(NULL, len, buffer, 1u);
+        TEST_ASSERT_EQUAL(COBS_ENCODE_NULL_POINTER, encoded.status);
+        TEST_ASSERT_EQUAL_size_t(0u, encoded.out_len);
+        decoded = cobs_decode(buffer, sizeof(buffer), NULL, len);
+        TEST_ASSERT_EQUAL(COBS_DECODE_NULL_POINTER, decoded.status);
+        TEST_ASSERT_EQUAL_size_t(0u, decoded.out_len);
+        decoded = cobs_decode(NULL, len, buffer, 1u);
+        TEST_ASSERT_EQUAL(COBS_DECODE_NULL_POINTER, decoded.status);
+        TEST_ASSERT_EQUAL_size_t(0u, decoded.out_len);
+    }
+}
+
 int main(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
 
     UNITY_BEGIN();
+
+    RUN_TEST(test_cobs_null_pointers);
 
     RUN_TEST(test_COBS_ENCODE_DST_BUF_LEN_MAX);
     RUN_TEST(test_cobs_fixed);

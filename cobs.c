@@ -41,11 +41,11 @@ cobs_encode_result cobs_encode(void * dst_buf_ptr, size_t dst_buf_len,
 {
     cobs_encode_result  result              = { 0u, COBS_ENCODE_OK };
     const uint8_t *     src_read_ptr        = src_ptr;
-    const uint8_t *     src_end_ptr         = src_read_ptr + src_len;
+    const uint8_t *     src_end_ptr;
     uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
-    uint8_t *           dst_buf_end_ptr     = dst_buf_start_ptr + dst_buf_len;
+    uint8_t *           dst_buf_end_ptr;
     uint8_t *           dst_code_write_ptr  = dst_buf_start_ptr;
-    uint8_t *           dst_write_ptr       = dst_code_write_ptr + 1u;
+    uint8_t *           dst_write_ptr;
     uint8_t             src_byte            = 0u;
     uint8_t             search_len          = 1u;
 
@@ -56,6 +56,10 @@ cobs_encode_result cobs_encode(void * dst_buf_ptr, size_t dst_buf_len,
         result.status = COBS_ENCODE_NULL_POINTER;
         return result;
     }
+
+    src_end_ptr = src_read_ptr + src_len;
+    dst_buf_end_ptr = dst_buf_start_ptr + dst_buf_len;
+    dst_write_ptr = dst_code_write_ptr + 1u;
 
     if (src_len != 0u)
     {
@@ -141,9 +145,9 @@ cobs_decode_result cobs_decode(void * dst_buf_ptr, size_t dst_buf_len,
 {
     cobs_decode_result  result              = { 0u, COBS_DECODE_OK };
     const uint8_t *     src_read_ptr        = src_ptr;
-    const uint8_t *     src_end_ptr         = src_read_ptr + src_len;
+    const uint8_t *     src_end_ptr;
     uint8_t *           dst_buf_start_ptr   = dst_buf_ptr;
-    uint8_t *           dst_buf_end_ptr     = dst_buf_start_ptr + dst_buf_len;
+    uint8_t *           dst_buf_end_ptr;
     uint8_t *           dst_write_ptr       = dst_buf_start_ptr;
     size_t              remaining_bytes;
     uint8_t             src_byte;
@@ -157,6 +161,9 @@ cobs_decode_result cobs_decode(void * dst_buf_ptr, size_t dst_buf_len,
         result.status = COBS_DECODE_NULL_POINTER;
         return result;
     }
+
+    src_end_ptr = src_read_ptr + src_len;
+    dst_buf_end_ptr = dst_buf_start_ptr + dst_buf_len;
 
     if (src_len != 0u)
     {
